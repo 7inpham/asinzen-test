@@ -8,7 +8,7 @@ export enum FolderVisibleRight {
 
 export interface Folder {
   id: string
-  title: string
+  name: string
   visible: FolderVisibleRight
   visibleUsers?: User[]
   children?: Folder[]

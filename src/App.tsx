@@ -17,7 +17,7 @@ function App() {
   }
 
   return (
-    <div>
+    <div className="app-container">
       <h2>Copy Data to Folder</h2>
       <SelectFolder
         value={selectedFolder}

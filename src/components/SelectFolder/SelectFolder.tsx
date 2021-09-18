@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { DownOutlined } from '@ant-design/icons'
 import { Button, Dropdown } from 'antd'
-import SelectFolderOverlay from './SelectFolderOverlay'
 import { Folder } from '../../interfaces/Folder'
+import SelectFolderOverlay from './SelectFolderOverlay'
+import './SelectFolder.css'
 
 interface Props {
   value: Folder | null
@@ -19,21 +20,21 @@ export default function SelectFolder(props: Props) {
     setDropdownVisible(flag)
   }
 
-  const handleSelectedFolder = (folder: Folder) => {
+  const handleSelecteFolder = (folder: Folder) => {
     setDropdownVisible(false)
     if (onSelectFolder) {
       onSelectFolder(folder)
     }
   }
 
-  const handleUpdatedFolders = (folders: Folder[]) => {
+  const handleUpdateFolders = (folders: Folder[]) => {
     if (onUpdateFolders) {
       onUpdateFolders(folders)
     }
   }
 
   return (
-    <div>
+    <div className="select-folder">
       <Dropdown
         trigger={['click']}
         visible={dropdownVisible}
@@ -41,15 +42,15 @@ export default function SelectFolder(props: Props) {
         overlay={
           <SelectFolderOverlay
             folders={folders}
-            onUpdate={handleUpdatedFolders}
-            onSelect={handleSelectedFolder}
+            onUpdate={handleUpdateFolders}
+            onSelect={handleSelecteFolder}
           />
         }
       >
-        <Button>
+        <Button className="select-folder-trigger">
           {
             value
-              ? <span>{value.title}</span>
+              ? <span>{value.name}</span>
               : <span>Select folder</span>
           }
           <DownOutlined/>

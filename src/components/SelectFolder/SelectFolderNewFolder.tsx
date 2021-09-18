@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { CaretRightOutlined, DeleteFilled, FolderFilled, SaveFilled } from '@ant-design/icons'
+import { DeleteFilled, FolderFilled, SaveFilled } from '@ant-design/icons'
 import { Folder, FolderVisibleRight } from '../../interfaces/Folder'
 import { Input, Select } from 'antd'
-import { SampleUsers } from '../../sample'
 import { User } from '../../interfaces/User'
+import { SampleUsers } from '../../sample'
 
 const { Option } = Select
 
@@ -16,10 +16,10 @@ interface Props {
 export default function SelectFolderNewFolder(props: Props) {
   const [ folder, setFolder ] = useState<Folder>(props.defaultValue)
 
-  const handleChangeTitle = (e: any) => {
+  const handleChangeName = (e: any) => {
     setFolder({
       ...folder,
-      title: e.target.value
+      name: e.target.value
     })
   }
 
@@ -46,7 +46,7 @@ export default function SelectFolderNewFolder(props: Props) {
   }
 
   const handleSave = () => {
-    if (props.onSave) {
+    if (folder.name && props.onSave) {
       props.onSave(folder)
     }
   }
@@ -58,39 +58,42 @@ export default function SelectFolderNewFolder(props: Props) {
   }
 
   return (
-    <div>
-      <CaretRightOutlined />
-      <FolderFilled />
-      <Input placeholder="Enter new folder name" defaultValue={folder.title} onChange={handleChangeTitle} />
-      <Select
-        style={{ width: '100%' }}
-        defaultValue={folder.visible}
-        onChange={handleChangeVisibleRight}
-      >
-        <Option value={FolderVisibleRight.EVERYONE}>{FolderVisibleRight.EVERYONE.toString()}</Option>
-        <Option value={FolderVisibleRight.ONLY_ME}>{FolderVisibleRight.ONLY_ME.toString()}</Option>
-        <Option value={FolderVisibleRight.SPECIFIC_USERS}>{FolderVisibleRight.SPECIFIC_USERS.toString()}</Option>
-      </Select>
-      {
-        folder.visible === FolderVisibleRight.SPECIFIC_USERS
-        &&
+    <div className="select-folder-new-folder">
+      <div className="select-folder-new-folder-icon">
+        <FolderFilled />
+      </div>
+      <div className="select-folder-new-folder-form">
+        <Input placeholder="Enter new folder name" defaultValue={folder.name} onChange={handleChangeName} />
         <Select
-          placeholder="Select users..."
-          mode="multiple"
           style={{ width: '100%' }}
-          defaultValue={folder.visibleUsers ? folder.visibleUsers.map((u) => u.id) : []}
-          onChange={handleChangeUsers}
+          defaultValue={folder.visible}
+          onChange={handleChangeVisibleRight}
         >
-          {
-            SampleUsers.map((user) => (
-              <Option value={user.id} key={user.id}>{user.name}</Option>
-            ))
-          }
+          <Option value={FolderVisibleRight.EVERYONE}>{FolderVisibleRight.EVERYONE.toString()}</Option>
+          <Option value={FolderVisibleRight.ONLY_ME}>{FolderVisibleRight.ONLY_ME.toString()}</Option>
+          <Option value={FolderVisibleRight.SPECIFIC_USERS}>{FolderVisibleRight.SPECIFIC_USERS.toString()}</Option>
         </Select>
-      }
-      <div>
-        <DeleteFilled onClick={handleDelete} />
-        <SaveFilled onClick={handleSave} />
+        {
+          folder.visible === FolderVisibleRight.SPECIFIC_USERS
+          &&
+          <Select
+            placeholder="Select users..."
+            mode="multiple"
+            style={{ width: '100%' }}
+            defaultValue={folder.visibleUsers ? folder.visibleUsers.map((u) => u.id) : []}
+            onChange={handleChangeUsers}
+          >
+            {
+              SampleUsers.map((user) => (
+                <Option value={user.id} key={user.id}>{user.name}</Option>
+              ))
+            }
+          </Select>
+        }
+        <div className="select-folder-new-folder-form-action">
+          <DeleteFilled onClick={handleDelete} className="action-delete" />
+          <SaveFilled onClick={handleSave} className={`action-save${folder.name ? '' : ' disabled'}`} />
+        </div>
       </div>
     </div>
   )

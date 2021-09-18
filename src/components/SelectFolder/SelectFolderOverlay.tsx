@@ -1,11 +1,53 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Divider, Input, Tree } from 'antd'
-import { Folder, FolderVisibleRight } from '../../interfaces/Folder'
-import SelectFolderNewFolder from './SelectFolderNewFolder'
 import { uid } from 'uid'
-import { findFolder, mapFoldersToTreeData, swapFolders } from './helpers'
+import { findFolderById, swapFolders } from '../../helpers'
+import { Folder, FolderVisibleRight } from '../../interfaces/Folder'
+import { DataNode } from 'rc-tree/lib/interface'
+import { FolderFilled, FolderOpenFilled } from '@ant-design/icons'
+import SelectFolderNewFolder from './SelectFolderNewFolder'
 
 const { Search } = Input
+
+function isMatched(name: string, searchValue: string) {
+  return searchValue && name.toLowerCase().includes(searchValue.toLowerCase())
+}
+
+function mapFoldersToTreeData(folders: Folder[], searchValue: string): DataNode[] {
+  return folders.map((folder) => ({
+    key: folder.id,
+    icon: (params: any) => {
+      return params.expanded ? <FolderOpenFilled /> : <FolderFilled />
+    },
+    title: (
+      <>
+        <h3 className={isMatched(folder.name, searchValue) ? 'highlighted' : ''}>{ folder.name }</h3>
+        <p>
+          {
+            folder.visible === FolderVisibleRight.SPECIFIC_USERS
+              ? `Visible to ${ !folder.visibleUsers || !folder.visibleUsers.length ? 'Noone' : folder.visibleUsers.map((user) => user.name).join(', ') }`
+              : folder.visible.toString()
+          }
+        </p>
+      </>
+    ),
+    children: folder.children ? mapFoldersToTreeData(folder.children, searchValue) : []
+  }))
+}
+
+function mapMatchedFoldersToExpandedKeys(folders: Folder[], searchValue: string, keys: any[] = []): any[] {
+  for (const folder of folders) {
+    if (isMatched(folder.name, searchValue)) {
+      if (!keys.includes(folder.id)) {
+        keys.push(folder.id)
+      }
+    }
+    if (folder.children) {
+      mapMatchedFoldersToExpandedKeys(folder.children, searchValue, keys)
+    }
+  }
+  return keys
+}
 
 interface Props {
   folders: Folder[]
@@ -15,6 +57,14 @@ interface Props {
 
 export default function SelectFolderOverlay(props: Props) {
   const [ newFolders, setNewFolders ] = useState<Folder[]>([])
+  const [ searchValue, setSearchValue ] = useState('')
+  const [ treeData, setTreeData ] = useState(mapFoldersToTreeData(props.folders, searchValue))
+  const [ expandedKeys, setExpandedKeys ] = useState<any[]>([])
+
+  useEffect(() => {
+    setTreeData(mapFoldersToTreeData(props.folders, searchValue))
+    setExpandedKeys(mapMatchedFoldersToExpandedKeys(props.folders, searchValue))
+  }, [searchValue, props.folders])
 
   const handleDrop = (info: any) => {
     const newFolders = swapFolders(props.folders, info)
@@ -22,42 +72,50 @@ export default function SelectFolderOverlay(props: Props) {
   }
 
   const handleSelect = (selectedKeys: any[]) => {
-    console.log(selectedKeys)
-    const selectedFolder = findFolder(props.folders, selectedKeys[0])
-    if (props.onSelect && selectedFolder) {
-      props.onSelect(selectedFolder)
+    const foundFolder = findFolderById(props.folders, selectedKeys[0])
+    if (props.onSelect && foundFolder) {
+      props.onSelect(foundFolder)
     }
   }
 
   const startAddingNewFolder = () => {
-    const newFolder = {
+    const newFolder: Folder = {
       id: uid(),
-      title: '',
+      name: '',
       visible: FolderVisibleRight.EVERYONE,
       visibleUsers: []
     }
-    setNewFolders([...newFolders, newFolder])
+    console.log([newFolder, ...newFolders])
+    setNewFolders([newFolder, ...newFolders])
   }
 
-  const handleDeleteNewFolder = (folder: Folder) => {
-    setNewFolders(newFolders.filter((f) => f.id !== folder.id))
+  const handleDeleteNewFolder = (index: number) => {
+    setNewFolders(newFolders.filter((_, i) => i !== index))
   }
 
-  const handleSaveNewFolder = (folder: Folder) => {
-    handleDeleteNewFolder(folder)
+  const handleSaveNewFolder = (index: number, folder: Folder) => {
+    setNewFolders(newFolders.filter((_, i) => i !== index))
     props.onUpdate([
       folder,
       ...props.folders
     ])
   }
 
+  const handleSearch = (e: any) => {
+    setSearchValue(e.target.value)
+  }
+
+  const handleExpand = (keys: any[]) => {
+    setExpandedKeys(keys)
+  }
+
   return (
-    <div>
-      <div>
-        <Search style={{ marginBottom: 8 }} placeholder="Search" />
-        <Button onClick={startAddingNewFolder}>Add new folder</Button>
+    <div className="select-folder-overlay">
+      <div className="select-folder-overlay-toolbar">
+        <Search placeholder="Search" defaultValue={searchValue} onChange={handleSearch} />
+        <Button type="link" onClick={startAddingNewFolder}>Add new folder</Button>
       </div>
-      <Divider style={{ margin: '4px 0' }} />
+      <Divider className="select-folder-overlay-divider" />
       {
         newFolders.length > 0
         &&
@@ -65,8 +123,8 @@ export default function SelectFolderOverlay(props: Props) {
           <SelectFolderNewFolder
             key={index}
             defaultValue={newFolder}
-            onSave={handleSaveNewFolder}
-            onDelete={handleDeleteNewFolder}
+            onSave={(folder: Folder) => handleSaveNewFolder(index, folder)}
+            onDelete={() => handleDeleteNewFolder(index)}
           />
         ))
       }
@@ -74,9 +132,12 @@ export default function SelectFolderOverlay(props: Props) {
         showIcon
         blockNode
         draggable
+        expandedKeys={expandedKeys}
+        autoExpandParent={true}
+        onExpand={handleExpand}
         onDrop={handleDrop}
         onSelect={handleSelect}
-        treeData={mapFoldersToTreeData(props.folders)}
+        treeData={treeData}
       />
     </div>
   )

@@ -1,28 +1,5 @@
-import { FolderFilled, FolderOpenFilled } from "@ant-design/icons"
 import { DataNode } from "rc-tree/lib/interface"
-import { Folder, FolderVisibleRight } from "../../interfaces/Folder"
-
-function mapFoldersToTreeData(folders: Folder[]): DataNode[] {
-  return folders.map((folder) => ({
-    key: folder.id,
-    icon: (params: any) => {
-      return params.expanded ? <FolderOpenFilled /> : <FolderFilled />
-    },
-    title: (
-      <span>
-        <h3>{ folder.title }</h3>
-        <p>
-          {
-            folder.visible === FolderVisibleRight.SPECIFIC_USERS
-              ? `Visible to ${ !folder.visibleUsers || !folder.visibleUsers.length ? 'Noone' : folder.visibleUsers.map((user) => user.name).join(', ') }`
-              : folder.visible.toString()
-          }
-        </p>
-      </span>
-    ),
-    children: folder.children ? mapFoldersToTreeData(folder.children) : []
-  }))
-}
+import { Folder, FolderVisibleRight } from "../interfaces/Folder"
 
 function swapFolders(folders: Folder[], info: any): Folder[] {
   const dropKey = info.node.key
@@ -48,7 +25,7 @@ function swapFolders(folders: Folder[], info: any): Folder[] {
   // Find dragObject
   let dragObj: Folder = {
     id: '',
-    title: '',
+    name: '',
     visible: FolderVisibleRight.EVERYONE
   }
   loop(data, dragKey, (item: Folder, index: number, arr: DataNode[]) => {
@@ -92,25 +69,26 @@ function swapFolders(folders: Folder[], info: any): Folder[] {
   return data
 }
 
-const findFolder = (folders: Folder[], key: string): Folder | undefined => {
-  const findNode = (current: Folder, key: string): Folder | undefined => {
-    let result: Folder | undefined
-    if (current.id === key) {
-      return current
-    }
-    if (current.children) {
-      for (const child of current.children) {
-        result = findNode(child, key)
-        if (result) {
-          return result
-        }
+const findFolderByIdRecursively = (folder: Folder, id: string): Folder | undefined => {
+  let result: Folder | undefined
+  if (folder.id === id) {
+    return folder
+  }
+  if (folder.children) {
+    for (const child of folder.children) {
+      result = findFolderByIdRecursively(child, id)
+      if (result) {
+        return result
       }
     }
-    return undefined
   }
+  return undefined
+}
+
+const findFolderById = (folders: Folder[], id: string): Folder | undefined => {
   let result: Folder | undefined
-  for (const current of folders) {
-    result = findNode(current, key)
+  for (const folder of folders) {
+    result = findFolderByIdRecursively(folder, id)
     if (result) {
       return result
     }
@@ -119,7 +97,6 @@ const findFolder = (folders: Folder[], key: string): Folder | undefined => {
 }
 
 export {
-  mapFoldersToTreeData,
   swapFolders,
-  findFolder
+  findFolderById
 }

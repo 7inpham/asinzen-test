@@ -20,36 +20,36 @@ export const SampleUsers: User[] = [
 export const SampleFolders: Folder[] = [
   {
     id: uid(),
-    title: 'My folder name 1',
+    name: 'My folder name 1',
     visible: FolderVisibleRight.EVERYONE,
     children: [
       {
         id: uid(),
-        title: 'My folder name 1-a',
+        name: 'My folder name 1-a',
         visible: FolderVisibleRight.EVERYONE,
       },
       {
         id: uid(),
-        title: 'My folder name 1-b',
+        name: 'My folder name 1-b',
         visible: FolderVisibleRight.EVERYONE,
       }
     ]
   },
   {
     id: uid(),
-    title: 'My folder name 2',
+    name: 'My folder name 2',
     visible: FolderVisibleRight.ONLY_ME,
     children: [
       {
         id: uid(),
-        title: 'My folder name 2-a',
+        name: 'My folder name 2-a',
         visible: FolderVisibleRight.EVERYONE,
       }
     ]
   },
   {
     id: uid(),
-    title: 'My folder name 3',
+    name: 'My folder name 3',
     visible: FolderVisibleRight.SPECIFIC_USERS,
     visibleUsers: [
       SampleUsers[0],
@@ -58,7 +58,7 @@ export const SampleFolders: Folder[] = [
     children: [
       {
         id: uid(),
-        title: 'My folder name 3-a',
+        name: 'My folder name 3-a',
         visible: FolderVisibleRight.EVERYONE,
       }
     ]

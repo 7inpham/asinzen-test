@@ -1,0 +1,88 @@
+.ant-tree-node-content-wrapper {
+  display: flex;
+}
+.ant-tree-title {
+  margin-left: 8px;
+}
+.ant-tree-title h3 {
+  margin: 0;
+  font-size: 14px;
+}
+.ant-tree-title p {
+  color: #a7a7a7;
+  margin: 0;
+  font-size: 12px;
+}
+.ant-tree-title h3.highlighted {
+  color: #ff9800;
+}
+
+.select-folder {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+
+}
+.select-folder-trigger {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  width: 500px;
+}
+.select-folder-overlay {
+  border: 1px solid #d9d9d9;
+  padding: 16px;
+  width: 500px;
+  max-height: 500px;
+  overflow: auto;
+}
+.select-folder-overlay-toolbar {
+  display: flex;
+}
+.select-folder-overlay-divider {
+  margin: 16px 0;
+}
+
+.select-folder-new-folder {
+  display: flex;
+  margin-bottom: 8px;
+}
+.select-folder-new-folder-icon {
+  font-size: 13px;
+  margin-left: 32px;
+}
+.select-folder-new-folder-form {
+  margin-left: 14px;
+  width: 100%;
+}
+.select-folder-new-folder-form .ant-input,
+.select-folder-new-folder-form .ant-select {
+  margin-bottom: 8px;
+}
+.select-folder-new-folder-form-action {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+.select-folder-new-folder-form-action .anticon {
+  margin-left: 8px;
+}
+.select-folder-new-folder-form-action .anticon:hover {
+  cursor: pointer;
+  opacity: 0.7;
+}
+.select-folder-new-folder-form-action .action-delete {
+  color: #f44336;
+}
+.select-folder-new-folder-form-action .action-save {
+  color: #539658;
+}
+.select-folder-new-folder-form-action .action-save.disabled {
+  color: #a7a7a7;
+}
+.select-folder-new-folder-form-action .action-save.disabled:hover {
+  cursor: auto;
+  opacity: 1;
+}
