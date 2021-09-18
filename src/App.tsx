@@ -1,26 +1,32 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react'
+import './App.css'
+import { SelectFolder } from './components/SelectFolder'
+import { Folder } from './interfaces/Folder'
+import { SampleFolders } from './sample'
 
 function App() {
+  const [ folders, setFolders ] = useState(SampleFolders)
+  const [ selectedFolder, setSelectedFolder ] = useState<Folder | null>(null)
+
+  const handleSelectFolder = (selectedFolder: Folder) => {
+    setSelectedFolder(selectedFolder)
+  }
+
+  const handleUpdateFolders = (updatedFolders: Folder[]) => {
+    setFolders(updatedFolders)
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h2>Copy Data to Folder</h2>
+      <SelectFolder
+        value={selectedFolder}
+        folders={folders}
+        onSelectFolder={handleSelectFolder}
+        onUpdateFolders={handleUpdateFolders}
+      />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
